@@ -8,6 +8,8 @@ class Group(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teaching_groups')
     student = models.ManyToManyField(User, related_name="student_groups")
 
+    objects = models.Manager()
+
     def __str__(self):
         return f"Group name: {self.name}, Teacher: {self.teacher}"
 
