@@ -64,4 +64,7 @@ class QuizUpdateAPIVew(generics.UpdateAPIView):
     queryset = Quiz.objects.all()
     lookup_field = "pk"
 
-
+class QuizDeleteAPIView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsCreatorOfQuiz]
+    queryset = Quiz.objects.all()
+    lookup_field = "pk"
