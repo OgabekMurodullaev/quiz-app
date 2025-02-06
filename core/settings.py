@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # my apps
     'users',
     'groups',
+    'quizzes',
 ]
 
 MIDDLEWARE = [
