@@ -40,6 +40,8 @@ class Choice(models.Model):
     text = models.CharField(max_length=150)
     is_correct = models.BooleanField(default=False)
 
+    objects = models.Manager()
+
     def __str__(self):
         return f"{self.question.text[:20]} - {self.text}"
 

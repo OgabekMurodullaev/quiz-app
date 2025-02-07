@@ -7,3 +7,10 @@ class IsCreatorOfQuiz(BasePermission):
         if obj.teacher == request.user:
             return True
         raise PermissionDenied(f"Siz bu testning egasi emassiz va testni yangilay olmaysiz!")
+
+
+class IsQuizOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if obj.quiz.teacher == request.user:
+            return True
+        raise PermissionDenied(f"Siz bu testning egasi emassiz va uni yangilay olmaysiz!")

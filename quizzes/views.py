@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from groups.permissions import IsTeacher
-from quizzes.models import Quiz
-from quizzes.permissions import IsCreatorOfQuiz
-from quizzes.serializers import CreateQuizSerializer, QuizzesListSerializer
+from quizzes.models import Quiz, Question
+from quizzes.permissions import IsCreatorOfQuiz, IsQuizOwner
+from quizzes.serializers import CreateQuizSerializer, QuizzesListSerializer, QuestionSerializer
 
 
 class TeacherQuizzesListAPIView(APIView):
@@ -67,4 +67,27 @@ class QuizUpdateAPIVew(generics.UpdateAPIView):
 class QuizDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsCreatorOfQuiz]
     queryset = Quiz.objects.all()
+    lookup_field = "pk"
+
+
+class CreateQuestionAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsTeacher]
+    serializer_class = QuestionSerializer
+
+    def post(self, request):
+        serializer = QuestionSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "message": "Savol qo'shildi",
+                "data": serializer.data
+            }
+            return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class QuestionRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsQuizOwner]
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
     lookup_field = "pk"
