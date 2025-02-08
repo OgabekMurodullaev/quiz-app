@@ -49,7 +49,7 @@ class TestResult(models.Model):
 
     def save(self, *args, **kwargs):
         self.correct_answers = self.session.answers.filter(is_correct=True).count()
-        self.incorrect_answers = self.session.anwers.filter(is_correct=False).count()
+        self.incorrect_answers = self.session.answers.filter(is_correct=False).count()
         self.total_score = (self.correct_answers / self.session.quiz.questions.count()) * 100
 
         super().save(*args, **kwargs)
