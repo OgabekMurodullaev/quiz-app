@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Quiz, Question, Choice, StudentAnswer
+from .models import Quiz, Question, Choice
 
 
 @admin.register(Quiz)
@@ -17,7 +17,4 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = ["id", "quiz"]
     inlines = [ChoiceInline]
 
-@admin.register(StudentAnswer)
-class StudentAnswerAdmin(admin.ModelAdmin):
-    list_display = ["id", "student", "question", "selected_choice", "answered_at"]
 

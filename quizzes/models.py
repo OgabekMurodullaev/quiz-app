@@ -48,17 +48,3 @@ class Choice(models.Model):
     class Meta:
         verbose_name = "Choice"
         verbose_name_plural = "Choices"
-
-
-class StudentAnswer(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name="answers")
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
-    selected_choice = models.ForeignKey(Choice, on_delete=models.CASCADE, related_name="answers")
-    answered_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.student.username} - {self.question.text[:20]} - {self.selected_choice.text}"
-
-    class Meta:
-        verbose_name = "StudentAnswer"
-        verbose_name_plural = "StudentAnswers"
