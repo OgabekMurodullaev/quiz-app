@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import get_object_or_404
 
 from groups.models import Group
 from quizzes.models import Quiz, Choice, Question
@@ -44,29 +45,55 @@ class ChoiceSerializer(serializers.ModelSerializer):
         fields = ["id", "text", "is_correct"]
 
 
+class ChoiceCreateSerializer(serializers.ModelSerializer):
+    question = serializers.PrimaryKeyRelatedField(queryset=Question.objects.all(), allow_null=False)
+
+    class Meta:
+        model = Choice
+        fields = ["question", "text", "is_correct"]
+
+    def validate_question(self, question):
+        print("Validatsiya ishladi")
+        if not Question.objects.filter(id=question.id).exists():
+            raise ValidationError(f"{question.id} ID li savol topilmadi!")
+        return question
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     choices = ChoiceSerializer(many=True)
     quiz = serializers.PrimaryKeyRelatedField(queryset=Quiz.objects.all())
 
     class Meta:
         model = Question
-        fields = ["quiz", "text", "choices"]
+        fields = ["id", "quiz", "text", "choices"]
 
     def validate_quiz(self, value):
-        quiz = Quiz.objects.filter(id=value.id).first()
-        if quiz is None:
-            raise ValidationError(f"{quiz} idli quiz topilmadi!")
+        try:
+            quiz = Quiz.objects.get(id=value.id)
+        except Quiz.DoesNotExist:
+            raise ValidationError(f"{value.id} idli quiz topilmadi!")
 
-        if quiz and quiz.teacher != self.context['request'].user:
-            raise ValidationError("Kechirasiz siz bu Quizga savol qo'shish imkoniyatiga ega emassiz")
+        if quiz.teacher != self.context['request'].user:
+            raise ValidationError("Kechirasiz, siz bu Quizga savol qo'shish imkoniyatiga ega emassiz.")
 
         return value
 
     def create(self, validated_data):
         choices_data = validated_data.pop("choices")
         question = Question.objects.create(**validated_data)
-
         for choice_data in choices_data:
-            Choice.objects.create(question=question, text=choice_data["text"], is_correct=choice_data["is_correct"])
+            Choice.objects.create(question=question, **choice_data)
 
         return question
+
+
+class UpdateQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ["text"]
+
+    def update(self, instance, validated_data):
+        instance.text = validated_data.get("text", instance.text)
+        instance.save()
+        return instance
+

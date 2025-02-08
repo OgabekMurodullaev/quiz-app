@@ -2,11 +2,13 @@ from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from yaml import serialize
 
 from groups.permissions import IsTeacher
-from quizzes.models import Quiz, Question
+from quizzes.models import Quiz, Question, Choice
 from quizzes.permissions import IsCreatorOfQuiz, IsQuizOwner
-from quizzes.serializers import CreateQuizSerializer, QuizzesListSerializer, QuestionSerializer
+from quizzes.serializers import CreateQuizSerializer, QuizzesListSerializer, QuestionSerializer, \
+    UpdateQuestionSerializer, ChoiceSerializer, ChoiceCreateSerializer
 
 
 class TeacherQuizzesListAPIView(APIView):
@@ -70,6 +72,25 @@ class QuizDeleteAPIView(generics.DestroyAPIView):
     lookup_field = "pk"
 
 
+class QuizQuestionsListAPIView(APIView):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = QuestionSerializer
+
+    def get(self, request, quiz_id):
+        try:
+            quiz = Quiz.objects.get(id=quiz_id)
+            serializer = QuestionSerializer(quiz.questions.all(), many=True)
+            data = {
+                "quiz": quiz.name,
+                "questions": serializer.data
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Quiz.DoesNotExist as e:
+            return Response(f"Quiz topilmadi!", status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class CreateQuestionAPIView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
     serializer_class = QuestionSerializer
@@ -86,8 +107,37 @@ class CreateQuestionAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class QuestionRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+class QuestionRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsQuizOwner]
     queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
+    serializer_class = UpdateQuestionSerializer
     lookup_field = "pk"
+
+
+class QuestionChoicesAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, question_id):
+        try:
+            question = Question.objects.get(id=question_id)
+            serializer = ChoiceSerializer(question.choices.all(), many=True)
+            data = {
+                "Question": question.text,
+                "Variants": serializer.data
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except Question.DoesNotExist:
+            return Response(data={"message": "Bunday id li savol mavjud emas"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChoiceCreateView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = ChoiceCreateSerializer
+    queryset = Choice.objects.all()
+
+class ChoiceRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, ]
+    queryset = Choice.objects.all()
+    serializer_class = ChoiceSerializer
+    lookup_field = "pk"
+
