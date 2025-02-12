@@ -17,6 +17,17 @@ class TestSession(models.Model):
     def __str__(self):
         return f"{self.student.username} - {self.quiz.name} - {self.score}"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.is_completed:
+            correct_answers = self.result.correct_answers if hasattr (self, 'result') else 0
+            incorrect_answers = self.result.incorrect_answers if hasattr(self, 'result') else 0
+            self.score = correct_answers * 5
+
+            super().save(update_fields=['score'])
+
+
 
 class StudentAnswer(models.Model):
     session = models.ForeignKey(TestSession, on_delete=models.CASCADE, related_name="answers")

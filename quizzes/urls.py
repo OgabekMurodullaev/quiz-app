@@ -16,7 +16,7 @@ urlpatterns = [
     path('tests/create/', CreateQuestionAPIView.as_view()),
     path('tests/<int:pk>/', QuestionRetrieveUpdateView.as_view()),
 
-    path('choices/<int:question_id>/', QuestionChoicesAPIView.as_view()),
+    path('choices/by-question/<int:question_id>/', QuestionChoicesAPIView.as_view()),
     path('choices/create/', ChoiceCreateView.as_view()),
     path('choices/<int:pk>/', ChoiceRetrieveUpdateDestroyView.as_view()),
 ]

@@ -4,14 +4,14 @@ from exams.models import StudentAnswer, TestResult, TestSession
 from quizzes.models import Choice, Question
 
 
-class ChoiceSerializer(serializers.ModelSerializer):
+class ExamChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
         fields = ["id", "text"]
 
 
-class QuestionSerializer(serializers.ModelSerializer):
-    choices = ChoiceSerializer(many=True, read_only=True)
+class ExamQuestionSerializer(serializers.ModelSerializer):
+    choices = ExamChoiceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Question
@@ -54,4 +54,14 @@ class TestSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestSession
-        fields = ["id", "quiz", "started_at", "completed_at", "is_completed", "score", "result"]
+        fields = ["id", "student", "quiz", "started_at", "completed_at", "is_completed", "score", "result"]
+
+
+class LeaderboardSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source="student.username", read_only=True)
+    correct_answers = serializers.IntegerField(source="result.correct_answers", read_only=True)
+    incorrect_answers = serializers.IntegerField(source="result,incorrect_answers", read_only=True)
+
+    class Meta:
+        model = TestSession
+        fields = ["id", "student_id", "student_name", "score", "correct_answers", "incorrect_answers"]

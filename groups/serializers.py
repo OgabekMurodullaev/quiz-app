@@ -12,7 +12,7 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = ("name", "teacher", "students_count")
 
-    def get_students_count(self, obj):
+    def get_students_count(self, obj) -> int:
         return obj.student.count()
 
 

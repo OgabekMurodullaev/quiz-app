@@ -1,19 +1,19 @@
-from venv import create
-
 from django.db import transaction
-from rest_framework import generics, status
-from rest_framework.generics import get_object_or_404
+from rest_framework import status
+from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from exams.models import TestSession
-from exams.serializers import QuestionSerializer, StudentAnswerSerializer, StudentAnswerListSerializer
-from quizzes.models import Question, Quiz
+from exams.serializers import ExamQuestionSerializer, StudentAnswerSerializer, StudentAnswerListSerializer, \
+    TestResultSerializer, TestSessionSerializer, LeaderboardSerializer
+from quizzes.models import Quiz
 
 
 class QuizQuestionsListAPIView(APIView):
     permission_classes = [IsAuthenticated, ]
+    serializer_class = ExamQuestionSerializer
 
     def get(self, request, quiz_id):
         quiz = get_object_or_404(Quiz, id=quiz_id)
@@ -25,7 +25,7 @@ class QuizQuestionsListAPIView(APIView):
             )
 
         questions = quiz.questions.all()
-        serializer = QuestionSerializer(questions, many=True)
+        serializer = ExamQuestionSerializer(questions, many=True)
         data = {
             "detail": f"{quiz.name} - {quiz.teacher}",
             "questions": serializer.data
@@ -64,3 +64,23 @@ class SubmitStudentAnswersAPIView(APIView):
                 return Response({"detail": "Javoblar saqlandi."}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TestSessionResultAPIView(APIView):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = TestResultSerializer
+
+    def get(self, request, quiz_id, student_id):
+        test_session = get_object_or_404(TestSession, quiz_id=quiz_id, student_id=student_id, is_completed=True)
+
+        serializer = TestSessionSerializer(test_session)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LeaderBoardAPIView(ListAPIView):
+    serializer_class = LeaderboardSerializer
+
+    def  get_queryset(self):
+        quiz_id = self.kwargs["quiz_id"]
+        return TestSession.objects.filter(quiz=quiz_id, is_completed=True).order_by('-score')

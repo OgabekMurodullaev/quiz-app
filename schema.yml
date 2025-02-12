@@ -1,0 +1,964 @@
+openapi: 3.0.3
+info:
+  title: Quiz-app Project API
+  version: 1.0.0
+  description: Simple quiz app
+paths:
+  /exams/{quiz_id}/leaderboard/:
+    get:
+      operationId: exams_leaderboard_list
+      parameters:
+      - in: path
+        name: quiz_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - exams
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Leaderboard'
+          description: ''
+  /exams/{quiz_id}/questions/:
+    get:
+      operationId: exams_questions_retrieve
+      parameters:
+      - in: path
+        name: quiz_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - exams
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamQuestion'
+          description: ''
+  /exams/{quiz_id}/result/{student_id}/:
+    get:
+      operationId: exams_result_retrieve
+      parameters:
+      - in: path
+        name: quiz_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: student_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - exams
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResult'
+          description: ''
+  /exams/{quiz_id}/submit/:
+    post:
+      operationId: exams_submit_create
+      parameters:
+      - in: path
+        name: quiz_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - exams
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentAnswerList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentAnswerList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentAnswerList'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentAnswerList'
+          description: ''
+  /groups/{group_id}/add-students/:
+    post:
+      operationId: groups_add_students_create
+      parameters:
+      - in: path
+        name: group_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddStudentToGroup'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddStudentToGroup'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddStudentToGroup'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddStudentToGroup'
+          description: ''
+  /groups/{group_id}/info/:
+    get:
+      operationId: groups_info_retrieve
+      parameters:
+      - in: path
+        name: group_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - groups
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+  /groups/create/:
+    post:
+      operationId: groups_create_create
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroup'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateGroup'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateGroup'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGroup'
+          description: ''
+  /quizzes/{id}/:
+    get:
+      operationId: quizzes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizzesList'
+          description: ''
+  /quizzes/{id}/delete/:
+    delete:
+      operationId: quizzes_delete_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /quizzes/{id}/update/:
+    put:
+      operationId: quizzes_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuizzesList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QuizzesList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QuizzesList'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizzesList'
+          description: ''
+    patch:
+      operationId: quizzes_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizzesList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizzesList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizzesList'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizzesList'
+          description: ''
+  /quizzes/choices/{id}/:
+    get:
+      operationId: quizzes_choices_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Choice'
+          description: ''
+    put:
+      operationId: quizzes_choices_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Choice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Choice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Choice'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Choice'
+          description: ''
+    patch:
+      operationId: quizzes_choices_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChoice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChoice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChoice'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Choice'
+          description: ''
+    delete:
+      operationId: quizzes_choices_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /quizzes/choices/by-question/{question_id}/:
+    get:
+      operationId: quizzes_choices_by_question_retrieve
+      parameters:
+      - in: path
+        name: question_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Choice'
+          description: ''
+  /quizzes/choices/create/:
+    post:
+      operationId: quizzes_choices_create_create
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChoiceCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChoiceCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChoiceCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChoiceCreate'
+          description: ''
+  /quizzes/create/:
+    post:
+      operationId: quizzes_create_create
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuiz'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateQuiz'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateQuiz'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateQuiz'
+          description: ''
+  /quizzes/my-quizzes/:
+    get:
+      operationId: quizzes_my_quizzes_retrieve
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizzesList'
+          description: ''
+  /quizzes/tests/{id}/:
+    get:
+      operationId: quizzes_tests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateQuestion'
+          description: ''
+    put:
+      operationId: quizzes_tests_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuestion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateQuestion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateQuestion'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateQuestion'
+          description: ''
+    patch:
+      operationId: quizzes_tests_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateQuestion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateQuestion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateQuestion'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateQuestion'
+          description: ''
+    delete:
+      operationId: quizzes_tests_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /quizzes/tests/{quiz_id}/:
+    get:
+      operationId: quizzes_tests_list
+      parameters:
+      - in: path
+        name: quiz_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quizzes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
+          description: ''
+  /quizzes/tests/create/:
+    post:
+      operationId: quizzes_tests_create_create
+      tags:
+      - quizzes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Question'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Question'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Question'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+          description: ''
+  /users/login/:
+    post:
+      operationId: users_login_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /users/signup/:
+    post:
+      operationId: users_signup_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegister'
+          description: ''
+components:
+  schemas:
+    AddStudentToGroup:
+      type: object
+      properties:
+        students:
+          type: array
+          items:
+            type: integer
+      required:
+      - students
+    Choice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+          maxLength: 150
+        is_correct:
+          type: boolean
+      required:
+      - id
+      - text
+    ChoiceCreate:
+      type: object
+      properties:
+        question:
+          type: integer
+        text:
+          type: string
+          maxLength: 150
+        is_correct:
+          type: boolean
+      required:
+      - question
+      - text
+    CreateGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 10
+        students_ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - name
+    CreateQuiz:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        groups:
+          type: array
+          items:
+            type: integer
+      required:
+      - description
+      - groups
+      - name
+    ExamChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+          maxLength: 150
+      required:
+      - id
+      - text
+    ExamQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExamChoice'
+          readOnly: true
+      required:
+      - choices
+      - id
+      - text
+    Group:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 10
+        teacher:
+          type: integer
+        students_count:
+          type: integer
+          readOnly: true
+      required:
+      - name
+      - students_count
+      - teacher
+    Leaderboard:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        student_name:
+          type: string
+          readOnly: true
+        score:
+          type: number
+          format: double
+        correct_answers:
+          type: integer
+          readOnly: true
+        incorrect_answers:
+          type: integer
+          readOnly: true
+      required:
+      - correct_answers
+      - id
+      - incorrect_answers
+      - student_id
+      - student_name
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
+    PatchedChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+          maxLength: 150
+        is_correct:
+          type: boolean
+    PatchedQuizzesList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        groups:
+          type: array
+          items:
+            type: integer
+    PatchedUpdateQuestion:
+      type: object
+      properties:
+        text:
+          type: string
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        quiz:
+          type: integer
+        text:
+          type: string
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+      required:
+      - choices
+      - id
+      - quiz
+      - text
+    QuizzesList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        groups:
+          type: array
+          items:
+            type: integer
+      required:
+      - created_at
+      - description
+      - groups
+      - id
+      - name
+    StudentAnswer:
+      type: object
+      properties:
+        question:
+          type: integer
+        selected_choice:
+          type: integer
+          nullable: true
+      required:
+      - question
+    StudentAnswerList:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentAnswer'
+      required:
+      - answers
+    TestResult:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        correct_answers:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        incorrect_answers:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        total_score:
+          type: number
+          format: double
+      required:
+      - id
+    UpdateQuestion:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+      - text
+    UserRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

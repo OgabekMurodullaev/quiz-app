@@ -1,8 +1,8 @@
 from rest_framework import status, generics
+from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from yaml import serialize
 
 from groups.permissions import IsTeacher
 from quizzes.models import Quiz, Question, Choice
@@ -13,7 +13,7 @@ from quizzes.serializers import CreateQuizSerializer, QuizzesListSerializer, Que
 
 class TeacherQuizzesListAPIView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
-    serializer = QuizzesListSerializer
+    serializer_class = QuizzesListSerializer
 
     def get(self, request):
         teacher = request.user
@@ -68,27 +68,19 @@ class QuizUpdateAPIVew(generics.UpdateAPIView):
 
 class QuizDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsCreatorOfQuiz]
+    serializer_class = QuizzesListSerializer
     queryset = Quiz.objects.all()
     lookup_field = "pk"
 
 
-class QuizQuestionsListAPIView(APIView):
-    permission_classes = [IsAuthenticated, ]
+
+class QuizQuestionsListAPIView(ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = QuestionSerializer
 
-    def get(self, request, quiz_id):
-        try:
-            quiz = Quiz.objects.get(id=quiz_id)
-            serializer = QuestionSerializer(quiz.questions.all(), many=True)
-            data = {
-                "quiz": quiz.name,
-                "questions": serializer.data
-            }
-            return Response(data, status=status.HTTP_200_OK)
-
-        except Quiz.DoesNotExist as e:
-            return Response(f"Quiz topilmadi!", status=status.HTTP_400_BAD_REQUEST)
-
+    def get_queryset(self):
+        quiz = get_object_or_404(Quiz, id=self.kwargs.get("quiz_id"))
+        return quiz.questions.all()
 
 
 class CreateQuestionAPIView(APIView):
@@ -116,6 +108,7 @@ class QuestionRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
 class QuestionChoicesAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = ChoiceSerializer
 
     def get(self, request, question_id):
         try:
