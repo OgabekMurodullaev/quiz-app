@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import UserRegisterSerializer, LoginSerializer
+from .serializers import UserRegisterSerializer, LoginSerializer, TokenRefreshSerializer
 
 
 class UserRegisterAPIView(APIView):
@@ -67,15 +67,18 @@ class UserProfileView(APIView):
 
 class CustomTokenRefreshView(APIView):
     permission_classes = [AllowAny]
+    serializer_class = TokenRefreshSerializer
 
     def post(self, request, *args, **kwargs):
-        refresh_token = request.data.get("refresh")
-        if not refresh_token:
-            return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = TokenRefreshSerializer(data=request.data)
 
-        try:
+        if serializer.is_valid():
+            refresh_token = serializer.validated_data["refresh"]
 
-            token = RefreshToken(refresh_token)
-            return Response({"access": str(token.access_token)}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                token = RefreshToken(refresh_token)
+                return Response({"access": str(token.access_token)}, status=status.HTTP_200_OK)
+            except Exception:
+                return Response({"error": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

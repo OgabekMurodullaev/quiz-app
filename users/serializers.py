@@ -39,3 +39,7 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError("Username yoki parol noto'g'ri")
         return {"user": user}
+
+
+class TokenRefreshSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
