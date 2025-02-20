@@ -65,18 +65,17 @@ class UserProfileView(APIView):
         return Response(user_data)
 
 
-class RefreshTokenView(APIView):
-    permission_classes = [IsAuthenticated]
+class CustomTokenRefreshView(APIView):
+    permission_classes = [AllowAny]
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         refresh_token = request.data.get("refresh")
         if not refresh_token:
-            return Response({"detail": 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            refresh = RefreshToken(refresh_token)
-            new_access_token = str(refresh_token.access_token)
-            return Response({"access": new_access_token}, status=status.HTTP_200_OK)
 
+            token = RefreshToken(refresh_token)
+            return Response({"access": str(token.access_token)}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
