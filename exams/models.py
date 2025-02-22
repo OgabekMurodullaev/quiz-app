@@ -1,14 +1,18 @@
+from datetime import timedelta
+
 from django.db import models
+from django.utils.timezone import now
 
 from quizzes.models import Quiz, Question, Choice
 from users.models import User
+
 
 
 class TestSession(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name="test_sessions")
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="test_sessions")
     started_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)  # Tugash vaqtini saqlash
     score = models.FloatField(default=0.0)
     is_completed = models.BooleanField(default=False)
 
@@ -18,13 +22,17 @@ class TestSession(models.Model):
         return f"{self.student.username} - {self.quiz.name} - {self.score}"
 
     def save(self, *args, **kwargs):
+        if not self.started_at:
+            self.started_at = now()
+
+        if not self.completed_at:
+            self.completed_at = self.started_at + timedelta(minutes=self.quiz.duration)  # ✅ Quiz modelidan duration olinadi
+
         super().save(*args, **kwargs)
 
         if self.is_completed:
-            correct_answers = self.result.correct_answers if hasattr (self, 'result') else 0
-            incorrect_answers = self.result.incorrect_answers if hasattr(self, 'result') else 0
+            correct_answers = self.result.correct_answers if hasattr(self, 'result') else 0
             self.score = correct_answers * 5
-
             super().save(update_fields=['score'])
 
 

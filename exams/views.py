@@ -1,11 +1,12 @@
 from django.db import transaction
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from exams.models import TestSession
+from exams.models import TestSession, TestResult
 from exams.serializers import ExamQuestionSerializer, StudentAnswerSerializer, StudentAnswerListSerializer, \
     TestResultSerializer, TestSessionSerializer, LeaderboardSerializer
 from quizzes.models import Quiz
@@ -24,11 +25,17 @@ class QuizQuestionsListAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        # TestSession yaratish yoki mavjudini olish
+        session, created = TestSession.objects.get_or_create(student=request.user, quiz=quiz)
+
         questions = quiz.questions.all()
         serializer = ExamQuestionSerializer(questions, many=True)
         data = {
             "detail": f"{quiz.name} - {quiz.teacher}",
-            "questions": serializer.data
+            "questions": serializer.data,
+            "session_id": session.id,
+            "started_at": session.started_at,
+            "completed_at": session.completed_at
         }
 
         return Response(data=data, status=status.HTTP_200_OK)
@@ -48,7 +55,7 @@ class SubmitStudentAnswersAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        session, created = TestSession.objects.get_or_create(student=user, quiz=quiz)
+        session = get_object_or_404(TestSession, student=user, quiz=quiz)
 
         answers_data = request.data.get("answers", [])
 
@@ -60,10 +67,16 @@ class SubmitStudentAnswersAPIView(APIView):
                 data=answers_data, many=True, context={"request": request, "session": session}
             )
             if serializer.is_valid():
-                serializer.save()  # ✅ commit() shart emas, Django avtomatik commit qiladi
-                return Response({"detail": "Javoblar saqlandi."}, status=status.HTTP_201_CREATED)
+                serializer.save()
+
+                # ✅ Testni tugatish
+                session.is_completed = True
+                session.save(update_fields=['is_completed'])
+
+                return Response({"detail": "Javoblar saqlandi. Test yakunlandi."}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class TestSessionResultAPIView(APIView):

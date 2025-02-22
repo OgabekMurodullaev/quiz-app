@@ -8,6 +8,7 @@ class Quiz(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quizzes')
     name = models.CharField(max_length=100)
     description = models.TextField()
+    duration = models.IntegerField(help_text="Test davomiyligi (daqiqa)", default=30)
     created_at = models.DateTimeField(auto_now_add=True)
     groups = models.ManyToManyField(Group, related_name="quizzes")
 
