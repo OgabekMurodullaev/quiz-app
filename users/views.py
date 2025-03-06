@@ -1,13 +1,15 @@
-from idlelib.run import Executive
-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import UserRegisterSerializer, LoginSerializer, TokenRefreshSerializer
+from .filters import StudentFilter
+from .models import User
+from .serializers import UserRegisterSerializer, LoginSerializer, TokenRefreshSerializer, UserSerializer
 
 
 class UserRegisterAPIView(APIView):
@@ -49,9 +51,16 @@ class UserLoginAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = StudentFilter
+
 class UserProfileView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
 
     def get(self, request):
         user = request.user

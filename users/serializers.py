@@ -41,5 +41,11 @@ class LoginSerializer(serializers.Serializer):
         return {"user": user}
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "first_name", "last_name"]
+
+
 class TokenRefreshSerializer(serializers.Serializer):
     refresh = serializers.CharField()
