@@ -28,8 +28,17 @@ git clone https://github.com/OgabekMurodullaev/quiz-app.git
 cd quiz-app
 ```
 
-### **2️⃣ .env faylini sozlash**
-Loyiha muhit sozlamalarini `.env` faylga kiritish kerak. Agar **.env** fayl mavjud bo'lmasa, `cp .env.example .env` buyrug'i bilan nusxa olib, ichidagi **DATABASE_URL**, **SECRET_KEY**, va boshqa muhim ma'lumotlarni to'ldiring.
+### **2️⃣ .env faylini sozlash. .env faylini yarating va quydagilarni to'ldiring**
+```
+DEBUG=True
+SECRET_KEY=your_secret_key
+
+POSTGRES_DB=db_name
+POSTGRES_USER=db_user
+POSTGRES_PASSWORD=db_password
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+```
 
 ### **3️⃣ Docker konteynerlarni ishga tushirish**
 ```bash
@@ -90,17 +99,7 @@ Agar barcha ma’lumotlarni tozalab konteynerni to‘liq o‘chirmoqchi bo‘lsa
 docker-compose down -v
 ```
 
----
 
-## 🔗 Frontend uchun backend URL
-Frontend dasturchingiz React yoki boshqa frontend texnologiyasidan foydalansa, `.env` faylda quyidagicha backend API URL'ni qo'shishi kerak:
-```
-REACT_APP_API_BASE_URL=http://localhost:8000
-```
-
-Bu orqali frontend to‘g‘ridan-to‘g‘ri backend bilan integratsiya bo‘lishi mumkin.
-
----
 
 ## 🏗 Loyiha tuzilishi
 
@@ -125,21 +124,6 @@ quiz-app/
 
 ---
 
-## ✨ Muammolar va yechimlar
-
-**1️⃣ Xato:** `django.db.utils.OperationalError: could not connect to server`
-**Yechim:** Postgres konteyneri to‘liq ishga tushguncha biroz kutish kerak. Yoki `docker-compose logs db` orqali xatolarni tekshiring.
-
-**2️⃣ Xato:** `ModuleNotFoundError: No module named 'django'`
-**Yechim:** Docker konteyner ichida pip install bajarilganligini tekshiring:
-```bash
-docker-compose exec web pip list
-```
-
-**3️⃣ Xato:** `superuser` yaratishda foydalanuvchi e'lon qilinmagan
-**Yechim:** Superuser yaratishda username, email va parolni kiritganingizga ishonch hosil qiling.
-
----
 
 ## 🤝 Hissa qo'shish (Contributing)
 Agar loyihaga hissa qo‘shmoqchi bo‘lsangiz:

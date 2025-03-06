@@ -1,6 +1,7 @@
 Django
 djangorestframework
 djangorestframework_simplejwt
+django-filter
 drf-spectacular
 python-dotenv
 psycopg2-binary
